@@ -330,3 +330,31 @@ CREATE POLICY "ai_queries_own" ON ai_queries
 CREATE POLICY "ai_queries_super_admin_all" ON ai_queries
   FOR ALL USING (current_user_role() = 'super_admin');
 
+
+-- ================================================================
+-- PATCH: Restrict role column updates to super_admin only
+-- (users cannot promote themselves via profiles_own_update)
+-- ================================================================
+
+-- Drop the permissive own-update policy
+DROP POLICY IF EXISTS "profiles_own_update" ON profiles;
+
+-- Allow users to update ONLY their own non-role fields
+CREATE POLICY "profiles_own_update" ON profiles
+  FOR UPDATE
+  USING (id = auth.uid())
+  WITH CHECK (
+    id = auth.uid()
+    -- Prevent self-promotion: role can only change if caller is super_admin
+    AND (
+      role = (SELECT role FROM profiles WHERE id = auth.uid())
+      OR current_user_role() = 'super_admin'
+    )
+  );
+
+-- Allow super_admin to update ANY profile including role field
+CREATE POLICY "profiles_super_admin_update" ON profiles
+  FOR UPDATE
+  USING  (current_user_role() = 'super_admin')
+  WITH CHECK (current_user_role() = 'super_admin');
+
