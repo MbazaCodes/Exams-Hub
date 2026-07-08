@@ -16,13 +16,7 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18

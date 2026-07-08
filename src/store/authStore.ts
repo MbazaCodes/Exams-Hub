@@ -1,88 +1,72 @@
-<<<<<<< HEAD
-﻿import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { supabase, type StudentRow } from "@/lib/supabase";
-
-interface AuthState {
-  student: StudentRow | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-
-  login:   (email: string, password: string) => Promise<{ error?: string }>;
-  logout:  () => Promise<void>;
-  refresh: () => Promise<void>;
-=======
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
+import type { Profile } from "@/types";
 
-interface AuthState {
-  student: Record<string, unknown> | null;
+interface AuthStore {
+  user:            User | null;
+  profile:         Profile | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
-  logout: () => Promise<void>;
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+  isLoading:       boolean;
+  error:           string | null;
+  initialize:      () => Promise<void>;
+  login:           (identifier: string, password: string) => Promise<{ error?: string }>;
+  logout:          () => Promise<void>;
+  clearError:      () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStore>()(
   persist(
-<<<<<<< HEAD
     (set, get) => ({
-      student: null,
-      isLoading: false,
+      user:            null,
+      profile:         null,
       isAuthenticated: false,
+      isLoading:       false,
+      error:           null,
 
-      login: async (email, password) => {
-        set({ isLoading: true });
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          set({ isLoading: false });
-          return { error: error.message };
-        }
-        // Fetch student profile
+      initialize: async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { set({ isLoading: false }); return; }
         const { data: profile } = await supabase
-          .from("students")
-          .select("*")
-          .eq("id", data.user.id)
-          .single();
-        set({ student: profile, isAuthenticated: true, isLoading: false });
+          .from("profiles").select("*").eq("id", session.user.id).single();
+        set({ user: session.user, profile: profile as Profile, isAuthenticated: true, isLoading: false });
+
+        supabase.auth.onAuthStateChange(async (_event, s) => {
+          if (!s) { set({ user: null, profile: null, isAuthenticated: false }); return; }
+          const { data: p } = await supabase.from("profiles").select("*").eq("id", s.user.id).single();
+          set({ user: s.user, profile: p as Profile, isAuthenticated: true });
+        });
+      },
+
+      login: async (identifier, password) => {
+        set({ isLoading: true, error: null });
+        // Support phone or email login
+        const isPhone = /^[\d+]/.test(identifier) && !identifier.includes("@");
+        const creds = isPhone
+          ? { phone: identifier, password }
+          : { email: identifier, password };
+
+        const { data, error: authErr } = await supabase.auth.signInWithPassword(creds as any);
+        if (authErr) { set({ isLoading: false, error: authErr.message }); return { error: authErr.message }; }
+
+        const { data: profile } = await supabase
+          .from("profiles").select("*").eq("id", data.user.id).single();
+        set({ user: data.user, profile: profile as Profile, isAuthenticated: true, isLoading: false });
         return {};
       },
 
-=======
-    (set) => ({
-      student: null,
-      isAuthenticated: false,
-      isLoading: false,
-      login: async (email, password) => {
-        set({ isLoading: true });
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { set({ isLoading: false }); return { error: error.message }; }
-        const { data: profile } = await supabase.from("students").select("*").eq("id", data.user.id).single();
-        set({ student: profile, isAuthenticated: true, isLoading: false });
-        return {};
-      },
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
       logout: async () => {
         await supabase.auth.signOut();
-        set({ student: null, isAuthenticated: false });
+        set({ user: null, profile: null, isAuthenticated: false, error: null });
       },
-<<<<<<< HEAD
 
-      refresh: async () => {
-        const { data } = await supabase.auth.getUser();
-        if (!data.user) { set({ student: null, isAuthenticated: false }); return; }
-        const { data: profile } = await supabase
-          .from("students")
-          .select("*")
-          .eq("id", data.user.id)
-          .single();
-        set({ student: profile, isAuthenticated: !!profile });
-      },
-=======
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+      clearError: () => set({ error: null }),
     }),
-    { name: "examhub-auth", partialize: (s) => ({ student: s.student, isAuthenticated: s.isAuthenticated }) }
+    {
+      name:    "examhub-auth",
+      storage: createJSONStorage(() => sessionStorage), // sessionStorage: cleared on tab close
+      partialize: (s) => ({ profile: s.profile, isAuthenticated: s.isAuthenticated }),
+    }
   )
 );

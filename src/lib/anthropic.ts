@@ -1,93 +1,63 @@
-<<<<<<< HEAD
-﻿// Anthropic AI helper  used by Phase 5 AI Tutor
-// The API key is handled server-side via Supabase Edge Functions in production.
-// In dev/demo mode it calls the API directly from the browser.
+// ── AI Tutor ─────────────────────────────────────────────────────────────────
+// All Anthropic API calls go through our Supabase Edge Function.
+// The VITE_ANTHROPIC_KEY is NEVER used on the client side.
+// Browser → supabase.functions.invoke("ai-tutor") → Anthropic API
 
-=======
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+import { supabase } from "./supabase";
+
 export interface AIExplainRequest {
-  question: string;
-  correctAnswer: string;
+  question:      string;
+  correctAnswer: string | number | boolean;
   studentAnswer: string | number | boolean | null;
-  subject: string;
-  topic: string;
-  level: string;
+  subject:       string;
+  topic:         string;
+  level:         string;
+  examType?:     string;
 }
 
-<<<<<<< HEAD
 export interface AIExplainResponse {
   explanation: string;
+  commonMistakes?: string;
+  memoryTip?: string;
+  relatedTopics?: string[];
+  difficulty?: string;
   error?: string;
 }
 
-export async function explainQuestion(
-  req: AIExplainRequest
-): Promise<AIExplainResponse> {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_KEY;
-
-  if (!apiKey) {
-    return {
-      explanation: "",
-      error: "No API key found. Add VITE_ANTHROPIC_KEY to your .env file.",
-    };
-  }
-
-=======
-export async function explainQuestion(req: AIExplainRequest): Promise<{ explanation: string; error?: string }> {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_KEY;
-  if (!apiKey) return { explanation: "", error: "Add VITE_ANTHROPIC_KEY to your .env file." };
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+/**
+ * Call the AI Tutor via Supabase Edge Function.
+ * The Edge Function holds the Anthropic key server-side.
+ */
+export async function explainQuestion(req: AIExplainRequest): Promise<AIExplainResponse> {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 800,
-<<<<<<< HEAD
-        messages: [
-          {
-            role: "user",
-            content: `You are an expert ${req.subject} teacher in Tanzania teaching ${req.level} students.
-A student got a question ${req.studentAnswer === req.correctAnswer ? "correct" : "wrong"}.
-
-Question: ${req.question}
-Correct explanation: ${req.correctAnswer}
-Student answer: ${JSON.stringify(req.studentAnswer)}
-Topic: ${req.topic}
-
-Provide a clear, encouraging explanation in simple English. Include:
-1. Why the correct answer is right
-2. Common mistakes students make on this topic  
-3. One memory tip to remember this concept
-
-Be concise, use bullet points where helpful, and keep it appropriate for a ${req.level} student.`,
-          },
-        ],
-      }),
+    const { data, error } = await supabase.functions.invoke("ai-tutor", {
+      body: req,
     });
 
-    const data = await res.json();
+    if (error) return { explanation: "", error: error.message };
+    return data as AIExplainResponse;
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Network error";
+    return { explanation: "", error: msg };
+  }
+}
 
-    if (!res.ok) {
-      return { explanation: "", error: `API error: ${data.error?.message || res.statusText}` };
-    }
-
-    return { explanation: data.content?.[0]?.text || "No explanation returned." };
-  } catch (err) {
-    return { explanation: "", error: "Network error. Please check your connection." };
-=======
-        messages: [{
-          role: "user",
-          content: `You are an expert ${req.subject} teacher in Tanzania for ${req.level} students.\nQuestion: ${req.question}\nCorrect explanation: ${req.correctAnswer}\nStudent answer: ${JSON.stringify(req.studentAnswer)}\nTopic: ${req.topic}\n\nGive a clear, encouraging explanation with: 1) Why correct answer is right 2) Common mistakes 3) A memory tip. Keep it concise and appropriate for a ${req.level} student.`,
-        }],
-      }),
+/**
+ * Generate a personalized revision plan for a student.
+ */
+export async function generateRevisionPlan(params: {
+  studentId: string;
+  weakTopics: string[];
+  level: string;
+  daysUntilExam: number;
+}): Promise<{ plan: string; error?: string }> {
+  try {
+    const { data, error } = await supabase.functions.invoke("ai-revision-plan", {
+      body: params,
     });
-    const data = await res.json();
-    if (!res.ok) return { explanation: "", error: `API error: ${data.error?.message}` };
-    return { explanation: data.content?.[0]?.text || "No explanation returned." };
-  } catch {
-    return { explanation: "", error: "Network error. Check your connection." };
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+    if (error) return { plan: "", error: error.message };
+    return data as { plan: string };
+  } catch (e: unknown) {
+    return { plan: "", error: "Could not generate plan" };
   }
 }

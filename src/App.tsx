@@ -1,74 +1,77 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-<<<<<<< HEAD
-import LandingAuth   from "./pages/Phase1-Landing-Auth";
-import Dashboard     from "./pages/Phase2-Dashboard";
-import PapersBrowser from "./pages/Phase3-PapersBrowser";
-import ExamEngine    from "./pages/Phase4-ExamEngine";
-import Results       from "./pages/Phase5-Results";
-import Analytics     from "./pages/Phase6-Analytics";
-import Gamification  from "./pages/Phase7-Gamification";
-import AdminPortals  from "./pages/Phase8-AdminPortals";
-=======
+import { AuthGuard, RoleRedirect } from "@/components/auth";
 
-// Phase pages
-import LandingAuth      from "./pages/Phase1-Landing-Auth";
-import Dashboard        from "./pages/Phase2-Dashboard";
-import PapersBrowser    from "./pages/Phase3-PapersBrowser";
-import ExamEngine       from "./pages/Phase4-ExamEngine";
-import Results          from "./pages/Phase5-Results";
-import Analytics        from "./pages/Phase6-Analytics";
-import Gamification     from "./pages/Phase7-Gamification";
-import AdminPortals     from "./pages/Phase8-AdminPortals";
+// ── Lazy-load all pages (code splitting) ─────────────────────
+import { lazy, Suspense } from "react";
 
-// Role portals
-import TeacherDashboard     from "./pages/teacher/TeacherDashboard";
-import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
-import SuperAdminDashboard  from "./pages/super-admin/SuperAdminDashboard";
+const LandingAuth        = lazy(() => import("./pages/Phase1-Landing-Auth"));
+const Dashboard          = lazy(() => import("./pages/Phase2-Dashboard"));
+const PapersBrowser      = lazy(() => import("./pages/Phase3-PapersBrowser"));
+const ExamEngine         = lazy(() => import("./pages/Phase4-ExamEngine"));
+const Results            = lazy(() => import("./pages/Phase5-Results"));
+const Analytics          = lazy(() => import("./pages/Phase6-Analytics"));
+const Gamification       = lazy(() => import("./pages/Phase7-Gamification"));
+const AdminPortals       = lazy(() => import("./pages/Phase8-AdminPortals"));
+const TeacherDashboard   = lazy(() => import("./pages/teacher/TeacherDashboard"));
+const SchoolAdmin        = lazy(() => import("./pages/school-admin/SchoolAdminDashboard"));
+const SuperAdmin         = lazy(() => import("./pages/super-admin/SuperAdminDashboard"));
+const OnlineExamHub      = lazy(() => import("./pages/online-exam/OnlineExamHub"));
+const PublicLeaderboard  = lazy(() => import("./pages/public/PublicLeaderboard"));
 
-// Online exam + public pages
-import OnlineExamHub    from "./pages/online-exam/OnlineExamHub";
-import PublicLeaderboard from "./pages/public/PublicLeaderboard";
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
+const C = { navy:"#0A1628", indigo:"#4F46E5", gold:"#F59E0B" };
+
+function PageLoader() {
+  return (
+    <div style={{ minHeight:"100vh", background:C.navy, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:16 }}>
+      <div style={{ width:48, height:48, borderRadius:12, background:`linear-gradient(135deg,${C.indigo},${C.gold})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, color:"#fff" }}>E</div>
+      <div style={{ width:28, height:28, border:`3px solid rgba(99,102,241,0.3)`, borderTopColor:C.indigo, borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>
+      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-<<<<<<< HEAD
-        <Route path="/"            element={<LandingAuth />} />
-        <Route path="/dashboard"   element={<Dashboard />} />
-        <Route path="/papers"      element={<PapersBrowser />} />
-        <Route path="/exam"        element={<ExamEngine />} />
-        <Route path="/results"     element={<Results />} />
-        <Route path="/analytics"   element={<Analytics />} />
-        <Route path="/activities"  element={<Gamification />} />
-        <Route path="/admin"       element={<AdminPortals />} />
-        <Route path="*"            element={<Navigate to="/" replace />} />
-=======
-        {/* Public pages (no auth required) */}
-        <Route path="/"             element={<LandingAuth />} />
-        <Route path="/leaderboard"  element={<PublicLeaderboard />} />
-        <Route path="/online-exam"  element={<OnlineExamHub />} />
-        <Route path="/join"         element={<OnlineExamHub />} />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* ── Public routes (no auth required) ─── */}
+          <Route path="/"            element={<LandingAuth />} />
+          <Route path="/leaderboard" element={<PublicLeaderboard />} />
+          <Route path="/online-exam" element={<OnlineExamHub />} />
+          <Route path="/join"        element={<OnlineExamHub />} />
 
-        {/* Student portal */}
-        <Route path="/dashboard"    element={<Dashboard />} />
-        <Route path="/papers"       element={<PapersBrowser />} />
-        <Route path="/exam"         element={<ExamEngine />} />
-        <Route path="/results"      element={<Results />} />
-        <Route path="/analytics"    element={<Analytics />} />
-        <Route path="/activities"   element={<Gamification />} />
+          {/* ── After login: redirect based on role ─── */}
+          <Route path="/home"        element={<RoleRedirect />} />
 
-        {/* Role portals */}
-        <Route path="/teacher"      element={<TeacherDashboard />} />
-        <Route path="/school"       element={<SchoolAdminDashboard />} />
-        <Route path="/superadmin"   element={<SuperAdminDashboard />} />
-        <Route path="/admin"        element={<AdminPortals />} />
+          {/* ── Student routes (auth required) ─── */}
+          <Route path="/dashboard"   element={<AuthGuard><Dashboard /></AuthGuard>} />
+          <Route path="/papers"      element={<AuthGuard><PapersBrowser /></AuthGuard>} />
+          <Route path="/exam"        element={<AuthGuard><ExamEngine /></AuthGuard>} />
+          <Route path="/results"     element={<AuthGuard><Results /></AuthGuard>} />
+          <Route path="/analytics"   element={<AuthGuard><Analytics /></AuthGuard>} />
+          <Route path="/activities"  element={<AuthGuard><Gamification /></AuthGuard>} />
 
-        {/* Fallback */}
-        <Route path="*"             element={<Navigate to="/" replace />} />
->>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
-      </Routes>
+          {/* ── Teacher routes ─── */}
+          <Route path="/teacher" element={
+            <AuthGuard requiredRole="teacher"><TeacherDashboard /></AuthGuard>
+          }/>
+
+          {/* ── School Admin routes ─── */}
+          <Route path="/school" element={
+            <AuthGuard requiredRole="school_admin"><SchoolAdmin /></AuthGuard>
+          }/>
+
+          {/* ── Super Admin routes ─── */}
+          <Route path="/superadmin" element={
+            <AuthGuard requiredRole="super_admin"><SuperAdmin /></AuthGuard>
+          }/>
+
+          {/* ── Legacy / catch-all ─── */}
+          <Route path="/admin"  element={<AuthGuard requiredRole="teacher"><AdminPortals /></AuthGuard>} />
+          <Route path="*"       element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
