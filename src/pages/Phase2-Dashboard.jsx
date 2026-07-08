@@ -1,3 +1,4 @@
+import { TSIDCard } from "../components/profile/TSIDCard";
 import { useState } from "react";
 import { AreaChart,Area,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer } from "recharts";
 const C={navy:"#0A1628",navyMid:"#0F1F3D",navyCard:"#111E35",indigo:"#4F46E5",indigoL:"#6366F1",indigoD:"#3730A3",gold:"#F59E0B",teal:"#14B8A6",green:"#10B981",pink:"#EC4899",purple:"#8B5CF6",white:"#F0F4FF",muted:"#94A3B8",border:"rgba(99,102,241,0.18)",error:"#EF4444"};
@@ -5,7 +6,8 @@ const px=v=>`${v}px`;
 const card=(e={})=>({background:C.navyCard,border:`1px solid ${C.border}`,borderRadius:px(16),...e});
 const Tag=({children,color=C.indigo})=>(<span style={{display:"inline-block",padding:"3px 10px",borderRadius:px(100),fontSize:px(11),fontWeight:600,background:color+"22",color,border:`1px solid ${color}44`}}>{children}</span>);
 const Pill=({icon,label,value,color=C.indigo})=>(<div style={{display:"flex",alignItems:"center",gap:px(8),padding:"8px 14px",borderRadius:px(10),background:color+"15",border:`1px solid ${color}30`}}><span style={{fontSize:px(18)}}>{icon}</span><div><div style={{fontSize:px(11),color:C.muted,lineHeight:1}}>{label}</div><div style={{fontSize:px(14),fontWeight:700,color}}>{value}</div></div></div>);
-const STUDENT={name:"Amina Hassan",level:"Form 4",school:"Mwl. Nyerere Sec. School",streak:12,xp:3450,coins:280,level_num:7,overall:78,exams:34,best:"Biology",weakest:"Chemistry",badges:["🔥 Streak Master","⚡ Speed Solver","📚 Paper Champion","🌟 Top Performer","🎯 Accuracy Ace"]};
+const STUDENT={name:"Amina Hassan",level:"Form 4",school:"Mwl. Nyerere Sec. School",streak:12,xp:3450,coins:280,level_num:7,overall:78,exams:34,best:"Biology",weakest:"Chemistry",tsid: null, tsid_verified: false,
+  badges:["🔥 Streak Master","⚡ Speed Solver","📚 Paper Champion","🌟 Top Performer","🎯 Accuracy Ace"]};
 const TREND=[{month:"Aug",score:62},{month:"Sep",score:67},{month:"Oct",score:71},{month:"Nov",score:69},{month:"Dec",score:75},{month:"Jan",score:78}];
 const SUBJECTS=[{name:"Mathematics",score:72,color:C.indigo},{name:"Biology",score:88,color:C.green},{name:"Chemistry",score:61,color:C.error},{name:"Physics",score:79,color:C.teal},{name:"History",score:83,color:C.purple},{name:"Geography",score:76,color:C.gold},{name:"English",score:81,color:C.pink},{name:"Kiswahili",score:85,color:C.indigoL}];
 const WEEKLY=[{day:"Mon",mins:45},{day:"Tue",mins:90},{day:"Wed",mins:30},{day:"Thu",mins:120},{day:"Fri",mins:75},{day:"Sat",mins:150},{day:"Sun",mins:60}];

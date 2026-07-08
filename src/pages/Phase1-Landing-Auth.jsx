@@ -1,3 +1,4 @@
+import { TSIDLogin } from "../components/auth/TSIDLogin";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -120,6 +121,28 @@ const LoginModal = ({ onClose, onSwitch }) => {
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState("");
   const [showPw,     setShowPw]     = useState(false);
+  const [useTSID,    setUseTSID]    = useState(false);
+
+  // ── TSID mode ─────────────────────────────
+  if (useTSID) return (
+    <div style={{ position:"fixed", inset:0, zIndex:200, display:"flex", alignItems:"center",
+      justifyContent:"center", background:"rgba(10,22,40,0.9)", backdropFilter:"blur(10px)", padding:20 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background:C.navyCard, border:`1px solid ${C.border}`, borderRadius:16,
+        width:"100%", maxWidth:400, padding:"28px 26px", position:"relative" }}>
+        <button onClick={onClose} style={{ position:"absolute", top:12, right:14,
+          background:"none", border:"none", color:C.muted, fontSize:18, cursor:"pointer" }}>✕</button>
+        <div style={{ textAlign:"center", marginBottom:20 }}>
+          <h2 style={{ fontSize:20, fontWeight:800, color:C.white, marginBottom:3 }}>Welcome back</h2>
+        </div>
+        <TSIDLogin onBack={() => setUseTSID(false)} onSuccess={onClose} />
+        <p style={{ textAlign:"center", marginTop:12, fontSize:13, color:C.muted }}>
+          No account?{" "}
+          <span style={{ color:C.gold, cursor:"pointer", fontWeight:700 }} onClick={onSwitch}>Register</span>
+        </p>
+      </div>
+    </div>
+  );
 
   const handleLogin = async () => {
     if (!identifier || !password) { setError("Please fill in all fields."); return; }
@@ -201,7 +224,11 @@ const LoginModal = ({ onClose, onSwitch }) => {
             {showPw ? "🙈" : "👁"}
           </button>
         </div>
-        <div style={{ textAlign:"right", marginBottom:16 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+          <button onClick={() => setUseTSID(true)} style={{ background:"none", border:"none",
+            color:C.gold, fontSize:12, cursor:"pointer", fontWeight:600, padding:0 }}>
+            🪪 Login with TSID instead
+          </button>
           <span style={{ color:C.indigoL, fontSize:12, cursor:"pointer" }}>Forgot password?</span>
         </div>
         <Btn variant="primary" onClick={handleLogin} disabled={loading}
