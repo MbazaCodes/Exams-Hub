@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# Dependencies
 node_modules/
 .pnp
@@ -9,11 +10,18 @@ dist-ssr/
 *.local
 
 # Environment variables  NEVER commit these
+=======
+node_modules/
+dist/
+dist-ssr/
+*.local
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+<<<<<<< HEAD
 
 # Editor
 .vscode/*
@@ -34,4 +42,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # TypeScript cache
+=======
+.DS_Store
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
 *.tsbuildinfo

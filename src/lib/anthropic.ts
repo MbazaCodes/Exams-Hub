@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 ﻿// Anthropic AI helper  used by Phase 5 AI Tutor
 // The API key is handled server-side via Supabase Edge Functions in production.
 // In dev/demo mode it calls the API directly from the browser.
 
+=======
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
 export interface AIExplainRequest {
   question: string;
   correctAnswer: string;
@@ -11,6 +14,7 @@ export interface AIExplainRequest {
   level: string;
 }
 
+<<<<<<< HEAD
 export interface AIExplainResponse {
   explanation: string;
   error?: string;
@@ -28,6 +32,11 @@ export async function explainQuestion(
     };
   }
 
+=======
+export async function explainQuestion(req: AIExplainRequest): Promise<{ explanation: string; error?: string }> {
+  const apiKey = import.meta.env.VITE_ANTHROPIC_KEY;
+  if (!apiKey) return { explanation: "", error: "Add VITE_ANTHROPIC_KEY to your .env file." };
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -35,6 +44,7 @@ export async function explainQuestion(
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 800,
+<<<<<<< HEAD
         messages: [
           {
             role: "user",
@@ -66,5 +76,18 @@ Be concise, use bullet points where helpful, and keep it appropriate for a ${req
     return { explanation: data.content?.[0]?.text || "No explanation returned." };
   } catch (err) {
     return { explanation: "", error: "Network error. Please check your connection." };
+=======
+        messages: [{
+          role: "user",
+          content: `You are an expert ${req.subject} teacher in Tanzania for ${req.level} students.\nQuestion: ${req.question}\nCorrect explanation: ${req.correctAnswer}\nStudent answer: ${JSON.stringify(req.studentAnswer)}\nTopic: ${req.topic}\n\nGive a clear, encouraging explanation with: 1) Why correct answer is right 2) Common mistakes 3) A memory tip. Keep it concise and appropriate for a ${req.level} student.`,
+        }],
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { explanation: "", error: `API error: ${data.error?.message}` };
+    return { explanation: data.content?.[0]?.text || "No explanation returned." };
+  } catch {
+    return { explanation: "", error: "Network error. Check your connection." };
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
   }
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import { useState } from "react";
 const C={navy:"#0A1628",navyMid:"#0F1F3D",navyCard:"#111E35",indigo:"#4F46E5",indigoL:"#6366F1",gold:"#F59E0B",teal:"#14B8A6",green:"#10B981",pink:"#EC4899",purple:"#8B5CF6",white:"#F0F4FF",muted:"#94A3B8",border:"rgba(99,102,241,0.18)",error:"#EF4444"};
 const px=v=>`${v}px`;const card=(e={})=>({background:C.navyCard,border:`1px solid ${C.border}`,borderRadius:px(14),...e});
@@ -15,3 +16,49 @@ const BadgeGrid=()=>(<div style={{...card({padding:"24px"})}}><div style={{fontW
 const Missions=()=>(<div style={{...card({padding:"24px"})}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:px(16)}}><div style={{fontWeight:700,fontSize:px(16),color:C.white}}> Daily Missions</div><span style={{fontSize:px(12),color:C.muted}}>Resets in 6h 42m</span></div><div style={{display:"flex",flexDirection:"column",gap:px(12)}}>{MISSIONS.map((m,i)=>(<div key={i} style={{padding:"14px 16px",borderRadius:px(10),background:C.navyMid,border:`1px solid ${C.border}`}}><div style={{display:"flex",alignItems:"center",gap:px(10),marginBottom:px(8)}}><span style={{fontSize:px(20)}}>{m.icon}</span><div style={{flex:1}}><div style={{fontWeight:600,fontSize:px(13),color:C.white}}>{m.text}</div></div><div style={{padding:"3px 10px",borderRadius:px(100),background:C.gold+"22",color:C.gold,fontSize:px(11),fontWeight:700}}>+{m.xp} XP</div></div><div style={{height:px(4),background:C.border,borderRadius:px(2)}}><div style={{width:`${Math.round((m.progress/m.target)*100)}%`,height:"100%",borderRadius:px(2),background:C.indigo}}/></div><div style={{fontSize:px(11),color:C.muted,marginTop:px(4)}}>{m.progress}/{m.target}</div></div>))}</div></div>);
 const Leaderboard=()=>(<div style={{...card({padding:"24px"})}}><div style={{fontWeight:700,fontSize:px(16),color:C.white,marginBottom:px(16)}}> National Leaderboard</div><div style={{display:"flex",flexDirection:"column",gap:px(8)}}>{LB.map((p,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:px(12),padding:"12px 14px",borderRadius:px(10),background:p.isMe?C.indigo+"20":C.navyMid,border:`1px solid ${p.isMe?C.indigo+"44":C.border}`}}><div style={{width:px(28),height:px(28),borderRadius:"50%",background:p.rank<=3?C.gold+"22":C.border,display:"flex",alignItems:"center",justifyContent:"center",fontSize:px(13),fontWeight:800,color:p.rank<=3?C.gold:C.muted,flexShrink:0}}>{p.badge||p.rank}</div><div style={{flex:1,minWidth:0}}><div style={{fontWeight:p.isMe?700:500,fontSize:px(13),color:p.isMe?C.indigoL:C.white,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}{p.isMe?" (You)":""}</div><div style={{fontSize:px(11),color:C.muted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.school}</div></div><div style={{textAlign:"right",flexShrink:0}}><div style={{fontWeight:700,fontSize:px(14),color:C.gold}}>{p.xp.toLocaleString()} XP</div><div style={{fontSize:px(11),color:C.muted}}> {p.streak}d</div></div></div>))}</div></div>);
 export default function Gamification(){return(<div style={{display:"flex",minHeight:"100vh",background:C.navy,color:C.white,fontFamily:"'Inter',system-ui,sans-serif"}}><Sidebar/><div style={{flex:1,minWidth:0}}><div style={{padding:"16px 24px",borderBottom:`1px solid ${C.border}`,background:C.navy,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}><div><div style={{fontWeight:800,fontSize:px(20)}}>Activities </div><div style={{fontSize:px(13),color:C.muted}}>Learn, earn XP, climb the leaderboard</div></div><div style={{display:"flex",gap:px(10)}}><div style={{padding:"8px 16px",borderRadius:px(10),background:C.gold+"18",border:`1px solid ${C.gold}33`,fontSize:px(13),fontWeight:700,color:C.gold}}> 3,450 XP</div><div style={{padding:"8px 16px",borderRadius:px(10),background:C.indigo+"18",border:`1px solid ${C.indigo}33`,fontSize:px(13),fontWeight:700,color:C.indigoL}}> 12 streak</div></div></div><main style={{padding:"24px",overflowY:"auto"}}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:px(16),marginBottom:px(20)}}><Flashcard/><DailyQuiz/></div><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:px(16),marginBottom:px(20)}}><Missions/><Leaderboard/></div><BadgeGrid/></main></div></div>);}
+=======
+export default function Phase7() {
+  const C = {
+    navy:"#0A1628", navyMid:"#0F1F3D", navyCard:"#111E35",
+    indigo:"#4F46E5", indigoL:"#6366F1", gold:"#F59E0B",
+    white:"#F0F4FF", muted:"#94A3B8", border:"rgba(99,102,241,0.18)",
+  };
+  return (
+    <div style={{display:"flex",minHeight:"100vh",background:C.navy,color:C.white,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <div style={{width:220,minHeight:"100vh",background:C.navyMid,borderRight:"1px solid "+C.border,display:"flex",flexDirection:"column",padding:"24px 0",flexShrink:0}}>
+        <div style={{padding:"0 20px 24px",borderBottom:"1px solid "+C.border,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,"+C.indigo+","+C.gold+")",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:16,color:"#fff"}}>E</div>
+          <div>
+            <div style={{fontWeight:800,fontSize:15,color:C.white}}>ExamHub</div>
+            <div style={{fontSize:11,color:C.gold,fontWeight:600}}>Tanzania</div>
+          </div>
+        </div>
+        <nav style={{padding:"12px 10px",flex:1}}>
+          {[["Home","/"],["Dashboard","/dashboard"],["Past Papers","/papers"],["Analytics","/analytics"],["Activities","/activities"],["Admin","/admin"]].map(([label,path])=>(
+            <a key={label} href={path} style={{display:"flex",alignItems:"center",padding:"10px 12px",borderRadius:10,marginBottom:2,color:C.muted,textDecoration:"none",fontSize:13,border:"1px solid transparent"}}>{label}</a>
+          ))}
+        </nav>
+      </div>
+      <div style={{flex:1,display:"flex",flexDirection:"column"}}>
+        <div style={{padding:"16px 24px",borderBottom:"1px solid "+C.border,background:C.navy,position:"sticky",top:0,zIndex:10}}>
+          <div style={{fontSize:20,fontWeight:800,color:C.white}}>Gamification and Activities</div>
+          <div style={{fontSize:13,color:C.muted,marginTop:2}}>Phase 7 — Run ExamHub-Complete-Setup.ps1 to load full component</div>
+        </div>
+        <main style={{flex:1,padding:"40px 24px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{textAlign:"center",maxWidth:480}}>
+            <div style={{fontSize:64,marginBottom:16}}>📋</div>
+            <h2 style={{fontSize:22,fontWeight:800,color:C.white,marginBottom:10}}>Gamification and Activities</h2>
+            <p style={{color:C.muted,fontSize:14,lineHeight:1.7,marginBottom:28}}>
+              The full Phase 7 component is in <strong style={{color:C.indigoL}}>ExamHub-Complete-Setup.ps1</strong>. Run it on your Windows machine and the full UI will appear here.
+            </p>
+            <div style={{display:"flex",gap:12,justifyContent:"center"}}>
+              <a href="/" style={{padding:"11px 22px",borderRadius:10,background:C.indigo,color:"#fff",fontWeight:600,fontSize:14,textDecoration:"none"}}>Home</a>
+              <a href="/dashboard" style={{padding:"11px 22px",borderRadius:10,background:"transparent",border:"1px solid "+C.border,color:C.muted,fontWeight:600,fontSize:14,textDecoration:"none"}}>Dashboard</a>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18

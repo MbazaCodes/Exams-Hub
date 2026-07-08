@@ -4,4 +4,8 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18

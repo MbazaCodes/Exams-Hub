@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿// ExamHub Tanzania  Shared TypeScript types
 
 export type Level = "Standard 4" | "Standard 7" | "Form 2" | "Form 4" | "Form 6";
@@ -8,6 +9,16 @@ export type Difficulty = "Easy" | "Medium" | "Hard";
 export type QuestionType = "mcq" | "truefalse" | "short" | "essay";
 export type Grade = "A" | "B" | "C" | "D" | "F";
 export type Division = "Division I" | "Division II" | "Division III" | "Division IV" | "Division Zero";
+=======
+export type Level      = "Standard 4" | "Standard 7" | "Form 2" | "Form 4" | "Form 6";
+export type Gender     = "male" | "female";
+export type SchoolType = "government" | "private";
+export type ExamType   = "NECTA" | "Mock Exam" | "Pre-National" | "Regional" | "District" | "School Exam";
+export type Difficulty = "Easy" | "Medium" | "Hard";
+export type QuestionType = "mcq" | "truefalse" | "short" | "essay";
+export type Grade      = "A" | "B" | "C" | "D" | "F";
+export type Division   = "Division I" | "Division II" | "Division III" | "Division IV" | "Division Zero";
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
 
 export interface Question {
   id: number;
@@ -29,7 +40,11 @@ export interface ExamMeta {
   type: ExamType;
   paper: string;
   difficulty: Difficulty;
+<<<<<<< HEAD
   duration: number;        // minutes
+=======
+  duration: number;
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
   questions: number;
   attempts: number;
   avgScore: number;
@@ -47,6 +62,7 @@ export interface ExamResult {
   correct: number;
   wrong: number;
   skipped: number;
+<<<<<<< HEAD
   timeTaken: number;      // seconds
   completedAt: string;
 }
@@ -66,3 +82,8 @@ export interface NavItem {
   path: string;
   active?: boolean;
 }
+=======
+  timeTaken: number;
+  completedAt: string;
+}
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18

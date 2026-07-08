@@ -8,6 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
+<<<<<<< HEAD
         navy: {
           DEFAULT: "#0A1628",
           mid: "#0F1F3D",
@@ -18,6 +19,10 @@ export default {
           gold:   "#F59E0B",
           teal:   "#14B8A6",
         },
+=======
+        navy: { DEFAULT: "#0A1628", mid: "#0F1F3D", card: "#111E35" },
+        brand: { indigo: "#4F46E5", gold: "#F59E0B", teal: "#14B8A6" },
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

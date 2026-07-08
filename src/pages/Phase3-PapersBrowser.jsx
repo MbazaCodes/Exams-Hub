@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import { useState, useMemo } from "react";
 const C={navy:"#0A1628",navyMid:"#0F1F3D",navyCard:"#111E35",indigo:"#4F46E5",indigoL:"#6366F1",gold:"#F59E0B",teal:"#14B8A6",green:"#10B981",pink:"#EC4899",purple:"#8B5CF6",white:"#F0F4FF",muted:"#94A3B8",border:"rgba(99,102,241,0.18)",error:"#EF4444"};
 const px=v=>`${v}px`;
@@ -21,3 +22,49 @@ const grouped=useMemo(()=>{const g={};filtered.forEach(p=>{if(!g[p.year])g[p.yea
 const meta=subject?(META[subject]||{icon:"",color:C.indigo}):null;
 const handleConfirm=p=>{setStartPaper(null);setToast(`Starting ${p.subject}  ${p.year} ${p.type}...`);setTimeout(()=>setToast(null),3000);};
 return(<div style={{display:"flex",minHeight:"100vh",background:C.navy,color:C.white,fontFamily:"'Inter',system-ui,sans-serif"}}><Sidebar/><div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}><div style={{padding:"16px 24px",borderBottom:`1px solid ${C.border}`,background:C.navy,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}><div><div style={{fontWeight:800,fontSize:"20px",color:C.white}}>Past Papers </div><div style={{fontSize:"13px",color:C.muted}}>Browse, filter and start practising</div></div><div style={{display:"flex",background:C.navyCard,border:`1px solid ${C.border}`,borderRadius:"8px",overflow:"hidden"}}>{["grid","grouped"].map(m=>(<button key={m} onClick={()=>setViewMode(m)} style={{padding:"7px 14px",border:"none",background:viewMode===m?C.indigo:"transparent",color:viewMode===m?"#fff":C.muted,fontSize:"12px",fontWeight:600,cursor:"pointer"}}>{m==="grid"?" Grid":" Year"}</button>))}</div></div><main style={{flex:1,padding:"24px",overflowY:"auto"}}><div style={{marginBottom:"20px"}}><div style={{fontSize:"12px",color:C.muted,fontWeight:600,letterSpacing:"1px",textTransform:"uppercase",marginBottom:"10px"}}>Education Level</div><div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>{LEVELS.map(l=>(<button key={l} onClick={()=>{setLevel(l);setSubject(null);}} style={{padding:"8px 18px",borderRadius:"100px",border:`1px solid ${level===l?C.indigo:C.border}`,background:level===l?`${C.indigo}22`:"transparent",color:level===l?C.indigoL:C.muted,fontWeight:level===l?700:400,fontSize:"13px",cursor:"pointer"}}>{l}</button>))}</div></div><div style={{marginBottom:"24px"}}><div style={{fontSize:"12px",color:C.muted,fontWeight:600,letterSpacing:"1px",textTransform:"uppercase",marginBottom:"10px"}}>Select Subject  {level}</div><SubjectGrid level={level} selected={subject} onSelect={setSubject}/></div>{subject&&(<><div style={{display:"flex",alignItems:"center",gap:"12px",marginBottom:"20px",padding:"16px 20px",...card(),borderColor:meta.color+"44",background:meta.color+"10"}}><div style={{width:"48px",height:"48px",borderRadius:"12px",background:meta.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"24px"}}>{meta.icon}</div><div><div style={{fontWeight:800,fontSize:"18px",color:meta.color}}>{subject}</div><div style={{fontSize:"13px",color:C.muted}}>{level}  {papers.length} papers</div></div><div style={{marginLeft:"auto",display:"flex",gap:"8px"}}><span style={{padding:"3px 10px",borderRadius:"100px",fontSize:"11px",fontWeight:600,background:meta.color+"22",color:meta.color,border:`1px solid ${meta.color}33`}}>20152024</span></div></div><div style={{display:"grid",gridTemplateColumns:"1fr auto auto auto",gap:"12px",marginBottom:"20px",alignItems:"end"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:"14px",top:"50%",transform:"translateY(-50%)",fontSize:"16px",pointerEvents:"none"}}></span><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by year, type, keyword..." style={{width:"100%",padding:"11px 14px 11px 40px",borderRadius:"10px",background:C.navyCard,border:`1px solid ${C.border}`,color:C.white,fontSize:"14px",outline:"none",boxSizing:"border-box"}} onFocus={e=>e.target.style.borderColor=C.indigo} onBlur={e=>e.target.style.borderColor=C.border}/></div><div><div style={{fontSize:"11px",color:C.muted,marginBottom:"5px",fontWeight:500}}>Exam Type</div><select value={examType} onChange={e=>setExamType(e.target.value)} style={{padding:"9px 12px",borderRadius:"8px",background:C.navyCard,border:`1px solid ${C.border}`,color:C.white,fontSize:"13px",cursor:"pointer",outline:"none"}}>{EXAM_TYPES.map(t=><option key={t}>{t}</option>)}</select></div><div><div style={{fontSize:"11px",color:C.muted,marginBottom:"5px",fontWeight:500}}>Difficulty</div><select value={diff} onChange={e=>setDiff(e.target.value)} style={{padding:"9px 12px",borderRadius:"8px",background:C.navyCard,border:`1px solid ${C.border}`,color:C.white,fontSize:"13px",cursor:"pointer",outline:"none"}}>{DIFFS.map(d=><option key={d}>{d}</option>)}</select></div><div><div style={{fontSize:"11px",color:C.muted,marginBottom:"5px",fontWeight:500}}>Results</div><div style={{padding:"9px 14px",borderRadius:"8px",background:meta.color+"18",color:meta.color,fontSize:"13px",fontWeight:700,border:`1px solid ${meta.color}33`}}>{filtered.length} papers</div></div></div>{viewMode==="grid"&&(<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:"14px"}}>{filtered.map(p=><PaperCard key={p.id} paper={p} onStart={setStartPaper}/>)}</div>)}{viewMode==="grouped"&&(<div style={{display:"flex",flexDirection:"column",gap:"28px"}}>{grouped.map(([yr,yp])=>(<div key={yr}><div style={{display:"flex",alignItems:"center",gap:"12px",marginBottom:"12px"}}><div style={{fontWeight:800,fontSize:"18px",color:meta.color}}>{yr}</div><div style={{height:"1px",flex:1,background:C.border}}/><span style={{padding:"2px 7px",borderRadius:"100px",fontSize:"10px",fontWeight:600,background:meta.color+"22",color:meta.color}}>{yp.length} papers</span></div><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:"12px"}}>{yp.map(p=><PaperCard key={p.id} paper={p} onStart={setStartPaper}/>)}</div></div>))}</div>)}{filtered.length===0&&(<div style={{textAlign:"center",padding:"60px 24px",color:C.muted}}><div style={{fontSize:"48px",marginBottom:"12px"}}></div><div style={{fontWeight:700,fontSize:"16px",color:C.white}}>No papers found</div><div style={{fontSize:"13px",marginTop:"6px"}}>Try adjusting your filters</div></div>)}</>)}{!subject&&(<div style={{textAlign:"center",padding:"60px 24px",color:C.muted}}><div style={{fontSize:"48px",marginBottom:"12px"}}></div><div style={{fontWeight:700,fontSize:"16px",color:C.white}}>Select a subject to browse papers</div><div style={{fontSize:"13px",marginTop:"6px"}}>Choose {level} then pick any subject above</div></div>)}</main></div><StartModal paper={startPaper} onClose={()=>setStartPaper(null)} onConfirm={handleConfirm}/>{toast&&(<div style={{position:"fixed",bottom:"24px",right:"24px",zIndex:500,background:C.green,color:"#fff",padding:"12px 20px",borderRadius:"12px",fontWeight:600,fontSize:"14px"}}> {toast}</div>)}</div>);}
+=======
+export default function Phase3() {
+  const C = {
+    navy:"#0A1628", navyMid:"#0F1F3D", navyCard:"#111E35",
+    indigo:"#4F46E5", indigoL:"#6366F1", gold:"#F59E0B",
+    white:"#F0F4FF", muted:"#94A3B8", border:"rgba(99,102,241,0.18)",
+  };
+  return (
+    <div style={{display:"flex",minHeight:"100vh",background:C.navy,color:C.white,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <div style={{width:220,minHeight:"100vh",background:C.navyMid,borderRight:"1px solid "+C.border,display:"flex",flexDirection:"column",padding:"24px 0",flexShrink:0}}>
+        <div style={{padding:"0 20px 24px",borderBottom:"1px solid "+C.border,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,"+C.indigo+","+C.gold+")",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:16,color:"#fff"}}>E</div>
+          <div>
+            <div style={{fontWeight:800,fontSize:15,color:C.white}}>ExamHub</div>
+            <div style={{fontSize:11,color:C.gold,fontWeight:600}}>Tanzania</div>
+          </div>
+        </div>
+        <nav style={{padding:"12px 10px",flex:1}}>
+          {[["Home","/"],["Dashboard","/dashboard"],["Past Papers","/papers"],["Analytics","/analytics"],["Activities","/activities"],["Admin","/admin"]].map(([label,path])=>(
+            <a key={label} href={path} style={{display:"flex",alignItems:"center",padding:"10px 12px",borderRadius:10,marginBottom:2,color:C.muted,textDecoration:"none",fontSize:13,border:"1px solid transparent"}}>{label}</a>
+          ))}
+        </nav>
+      </div>
+      <div style={{flex:1,display:"flex",flexDirection:"column"}}>
+        <div style={{padding:"16px 24px",borderBottom:"1px solid "+C.border,background:C.navy,position:"sticky",top:0,zIndex:10}}>
+          <div style={{fontSize:20,fontWeight:800,color:C.white}}>Past Papers Browser</div>
+          <div style={{fontSize:13,color:C.muted,marginTop:2}}>Phase 3 — Run ExamHub-Complete-Setup.ps1 to load full component</div>
+        </div>
+        <main style={{flex:1,padding:"40px 24px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{textAlign:"center",maxWidth:480}}>
+            <div style={{fontSize:64,marginBottom:16}}>📋</div>
+            <h2 style={{fontSize:22,fontWeight:800,color:C.white,marginBottom:10}}>Past Papers Browser</h2>
+            <p style={{color:C.muted,fontSize:14,lineHeight:1.7,marginBottom:28}}>
+              The full Phase 3 component is in <strong style={{color:C.indigoL}}>ExamHub-Complete-Setup.ps1</strong>. Run it on your Windows machine and the full UI will appear here.
+            </p>
+            <div style={{display:"flex",gap:12,justifyContent:"center"}}>
+              <a href="/" style={{padding:"11px 22px",borderRadius:10,background:C.indigo,color:"#fff",fontWeight:600,fontSize:14,textDecoration:"none"}}>Home</a>
+              <a href="/dashboard" style={{padding:"11px 22px",borderRadius:10,background:"transparent",border:"1px solid "+C.border,color:C.muted,fontWeight:600,fontSize:14,textDecoration:"none"}}>Dashboard</a>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18

@@ -13,17 +13,30 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "@tanstack/react-router": "^1.51.0",
+<<<<<<< HEAD
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+=======
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
     "framer-motion": "^11.3.0",
     "lucide-react": "^0.414.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+<<<<<<< HEAD
     "react-helmet-async": "^2.0.5",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^7.18.1",
     "recharts": "^2.12.7",
     "zustand": "^4.5.4"
+=======
+    "react-hot-toast": "^2.4.1",
+    "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^6.26.0",
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.4",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0"
+>>>>>>> 0b3c81e9470c74fd27c37a680978282ae4c33e18
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
