@@ -1,4 +1,14 @@
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "../lib/supabase";
+
+// Role → route map (must match App.tsx)
+const ROLE_ROUTES = {
+  student:      "/dashboard",
+  teacher:      "/teacher",
+  school_admin: "/school",
+  super_admin:  "/superadmin",
+  parent:       "/dashboard",
+};
 
 // ── Design tokens ──────────────────────────────────────────────
 const C = {
@@ -326,10 +336,52 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) { setError("Please fill in all fields."); return; }
-    setLoading(true); setError("");
-    setTimeout(() => { setLoading(false); alert("✓ Logged in! (Demo mode — connect Supabase Auth to enable real login)"); onClose(); }, 1200);
+    setLoading(true);
+    setError("");
+
+    try {
+      // Support both email and phone login
+      const isPhone = /^[\d+]/.test(email) && !email.includes("@");
+      const creds = isPhone ? { phone: email, password } : { email, password };
+
+      const { data, error: authErr } = await supabase.auth.signInWithPassword(creds);
+
+      if (authErr) {
+        setError(authErr.message);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch role from profiles table
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("role, full_name, is_active")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileErr || !profile) {
+        setError("Could not load your profile. Please contact support.");
+        setLoading(false);
+        return;
+      }
+
+      if (!profile.is_active) {
+        setError("Your account has been deactivated. Please contact support.");
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to the correct portal based on role
+      const route = ROLE_ROUTES[profile.role] ?? "/dashboard";
+      window.location.href = route;
+
+    } catch (e) {
+      setError("Network error. Please check your connection.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -421,10 +473,45 @@ const RegisterModal = ({ onClose, onSwitchToLogin }) => {
   const next = () => { if (validate()) setStep(s => s + 1); };
   const prev = () => setStep(s => s - 1);
 
-  const submit = () => {
+  const submit = async () => {
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => { setLoading(false); setStep(3); }, 1400);
+
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("create-student", {
+        body: {
+          full_name:   form.fullName,
+          phone:       form.phone   || null,
+          email:       form.email   || null,
+          password:    form.password,
+          gender:      form.gender  || null,
+          dob:         form.dob     || null,
+          school_id:   null,          // school lookup can be added later
+          region:      form.region  || null,
+          level:       form.level.toLowerCase().replace(" ", "_"),
+          combination: form.combination || null,
+        },
+      });
+
+      if (fnErr || data?.error) {
+        setErrors({ submit: fnErr?.message || data?.error || "Registration failed. Please try again." });
+        setLoading(false);
+        return;
+      }
+
+      // Auto-login after registration
+      const loginCreds = form.email
+        ? { email: form.email, password: form.password }
+        : { phone: form.phone,  password: form.password };
+
+      await supabase.auth.signInWithPassword(loginCreds);
+      setLoading(false);
+      setStep(3); // show success screen
+
+    } catch (e) {
+      setErrors({ submit: "Network error. Please check your connection." });
+      setLoading(false);
+    }
   };
 
   const progressPct = (step / (steps.length - 1)) * 100;
@@ -526,6 +613,11 @@ const RegisterModal = ({ onClose, onSwitchToLogin }) => {
               </div>
             )}
 
+            {errors.submit && (
+              <div style={{ background: `${C.error}18`, border: `1px solid ${C.error}44`, borderRadius: 9, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: C.error }}>
+                ⚠️ {errors.submit}
+              </div>
+            )}
             <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
               <Btn variant="ghost" onClick={prev} style={{ flex: 1, justifyContent: "center" }}>← Back</Btn>
               <Btn variant="gold" onClick={submit} disabled={loading} style={{ flex: 2, justifyContent: "center", color: C.navy }}>
@@ -549,7 +641,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }) => {
               <div style={{ color: C.muted, fontSize: 13 }}>{form.level}{form.combination ? ` · ${form.combination}` : ""}</div>
               <div style={{ color: C.muted, fontSize: 13 }}>{form.schoolName}{form.region ? `, ${form.region}` : ""}</div>
             </div>
-            <Btn variant="gold" onClick={onClose} style={{ width: "100%", justifyContent: "center", color: C.navy, fontSize: 16 }}>
+            <Btn variant="gold" onClick={() => { window.location.href = "/dashboard"; }} style={{ width: "100%", justifyContent: "center", color: C.navy, fontSize: 16 }}>
               Go to Dashboard →
             </Btn>
           </div>

@@ -5,6 +5,9 @@ import type { Session } from "@supabase/supabase-js";
 
 const C = { navy:"#0A1628", indigo:"#4F46E5", gold:"#F59E0B", muted:"#94A3B8" };
 
+// Role hierarchy — higher index = more access
+const ROLE_HIERARCHY = ["student", "teacher", "school_admin", "super_admin"];
+
 interface AuthGuardProps {
   children: ReactNode;
   requiredRole?: "student" | "teacher" | "school_admin" | "super_admin";
@@ -18,27 +21,54 @@ export function AuthGuard({ children, requiredRole, fallback = "/" }: AuthGuardP
 
   useEffect(() => {
     let mounted = true;
+
     const check = async () => {
       const { data: { session: s } } = await supabase.auth.getSession();
       if (!mounted) return;
-      if (!s) { navigate(fallback, { replace: true }); return; }
+
+      // Not logged in → redirect to login
+      if (!s) {
+        navigate(fallback, { replace: true });
+        return;
+      }
+
       setSession(s);
 
       if (requiredRole) {
-        const { data } = await supabase.from("profiles").select("role").eq("id", s.user.id).single();
-        const hierarchy = ["student","teacher","school_admin","super_admin"];
-        if (hierarchy.indexOf(data?.role) < hierarchy.indexOf(requiredRole)) {
-          navigate("/dashboard", { replace: true }); return;
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", s.user.id)
+          .single();
+
+        const userRole    = profileData?.role ?? "student";
+        const userLevel   = ROLE_HIERARCHY.indexOf(userRole);
+        const neededLevel = ROLE_HIERARCHY.indexOf(requiredRole);
+
+        if (userLevel < 0 || neededLevel < 0 || userLevel < neededLevel) {
+          // Redirect to the correct portal for their role instead of generic /dashboard
+          const roleRoutes: Record<string, string> = {
+            student:      "/dashboard",
+            teacher:      "/teacher",
+            school_admin: "/school",
+            super_admin:  "/superadmin",
+          };
+          navigate(roleRoutes[userRole] ?? "/dashboard", { replace: true });
+          return;
         }
       }
+
+      // All checks passed — show the page
       if (mounted) setChecking(false);
     };
 
     check();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
       if (!mounted) return;
       if (!s) navigate(fallback, { replace: true });
     });
+
     return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
 
