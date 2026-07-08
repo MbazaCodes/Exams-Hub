@@ -1,24 +1,18 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-export const supabaseAdmin = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+// ── NOTE: This file is NO LONGER imported by Edge Functions ───
+// Each function is self-contained (inlined helpers) to avoid
+// Deno bundle path resolution errors during deployment.
+//
+// This file is kept only as a reference / documentation.
+// Supabase Edge Functions are bundled in isolation from a temp
+// directory, which breaks relative ../_ shared imports.
+//
+// Each function imports directly from esm.sh:
+//   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+//
+// ── Shared constants (copy into functions as needed) ──────────
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin":  "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-
-export function respond(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-export function error(msg: string, status = 400) {
-  return respond({ error: msg }, status);
-}
