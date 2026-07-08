@@ -1,39 +1,63 @@
-// ── Edge Function: ai-revision-plan ───────────────────────────
+// ExamHub Tanzania — Edge Function: ai-revision-plan
+// Generates personalised NECTA revision schedule using Claude.
 
-const corsHeaders = {
+const CORS = {
   "Access-Control-Allow-Origin":  "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const ok  = (data: unknown)        => new Response(JSON.stringify(data),           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-const err = (msg: string, s = 400) => new Response(JSON.stringify({ error: msg }), { status: s,   headers: { ...corsHeaders, "Content-Type": "application/json" } });
+function ok(data: unknown): Response {
+  return new Response(JSON.stringify(data), {
+    status: 200,
+    headers: { ...CORS, "Content-Type": "application/json" },
+  });
+}
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+function fail(msg: string, status = 400): Response {
+  return new Response(JSON.stringify({ error: msg }), {
+    status,
+    headers: { ...CORS, "Content-Type": "application/json" },
+  });
+}
+
+Deno.serve(async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: CORS });
+  }
 
   const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
-  if (!ANTHROPIC_KEY) return err("AI not configured", 503);
+  if (!ANTHROPIC_KEY) {
+    return fail("AI not configured. Run: supabase secrets set ANTHROPIC_KEY=sk-ant-xxx", 503);
+  }
 
   try {
-    const { weakTopics, level, daysUntilExam, subjects } = await req.json();
+    const body = await req.json();
+    const { weakTopics, level, daysUntilExam, subjects } = body;
 
-    if (!level) return err("level is required");
+    if (!level) return fail("level is required");
 
-    const prompt = `You are an expert exam coach for Tanzanian ${level} students preparing for NECTA.
+    const topicList   = Array.isArray(weakTopics) ? weakTopics.join(", ") : "not specified";
+    const subjectList = Array.isArray(subjects)   ? subjects.join(", ")   : "all core subjects";
+    const days        = Number(daysUntilExam) || 90;
 
-The student has ${daysUntilExam ?? 90} days until their exam.
-Their subjects are: ${(subjects ?? []).join(", ") || "all core subjects"}.
-Their weakest topics are: ${(weakTopics ?? []).join(", ") || "not specified yet"}.
-
-Create a realistic daily revision plan that:
-1. Prioritises the weakest topics first
-2. Allocates 2-3 hours of study per day
-3. Rotates subjects to avoid burnout
-4. Includes brief weekend reviews
-5. Ends the final week with full mock exams
-
-Format as a week-by-week plan. Be specific (name actual topics per day). Keep it under 350 words. End with one motivational sentence.`;
+    const prompt = [
+      `You are an expert exam coach for Tanzanian ${level} students preparing for NECTA.`,
+      "",
+      `The student has ${days} days until their exam.`,
+      `Subjects: ${subjectList}.`,
+      `Weakest topics: ${topicList}.`,
+      "",
+      "Create a realistic daily revision plan that:",
+      "1. Prioritises the weakest topics first",
+      "2. Allocates 2-3 study hours per day",
+      "3. Rotates subjects to avoid burnout",
+      "4. Includes brief weekend reviews",
+      "5. Ends the final week with full mock exams",
+      "",
+      "Format as Week 1, Week 2, etc. Name specific topics for each day.",
+      "Keep it under 350 words. End with one motivational sentence.",
+    ].join("\n");
 
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -44,16 +68,22 @@ Format as a week-by-week plan. Be specific (name actual topics per day). Keep it
       },
       body: JSON.stringify({
         model:      "claude-sonnet-4-6",
-        max_tokens: 600,
+        max_tokens: 700,
         messages:   [{ role: "user", content: prompt }],
       }),
     });
 
-    if (!res.ok) return err(`Anthropic error: ${res.statusText}`, 502);
+    if (!res.ok) {
+      const errBody = await res.text();
+      return fail(`Anthropic API error ${res.status}: ${errBody}`, 502);
+    }
 
-    const data = await res.json() as { content: Array<{ text: string }> };
-    return ok({ plan: data.content?.[0]?.text ?? "" });
+    const data = await res.json() as { content: Array<{ type: string; text: string }> };
+    const plan  = data.content?.find((b) => b.type === "text")?.text ?? "";
+
+    return ok({ plan });
   } catch (e: unknown) {
-    return err(e instanceof Error ? e.message : "Unexpected error", 500);
+    const msg = e instanceof Error ? e.message : String(e);
+    return fail(`Server error: ${msg}`, 500);
   }
 });
