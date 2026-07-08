@@ -49,13 +49,35 @@ const JoinPage=({onJoin})=>{
   const handleJoin=async()=>{
     if(!code||!name||!school||!region){setErr("Please fill in all fields.");return;}
     setLoading(true);setErr("");
-    // In production: verify join code against Supabase online_exams table
-    // const {data,error} = await supabase.from("online_exams").select("*").eq("join_code",code.toUpperCase()).eq("status","live").single();
-    await new Promise(r=>setTimeout(r,1200));
-    if(code.toUpperCase()==="BIO2024"){
-      onJoin({name,school,region,exam:MOCK_EXAM});
-    } else {
-      setErr("Invalid or expired join code. Check with your teacher.");
+    try {
+      const { supabase } = await import("../../lib/supabase");
+      // First try the Edge Function
+      const { data, error: fnErr } = await supabase.functions.invoke("join-online-exam", {
+        body: { join_code: code.toUpperCase(), guest_name: name, guest_school: school, guest_region: region },
+      });
+      if (fnErr || data?.error) {
+        // Fallback: query directly (for demo exam BIO2024 in seed data)
+        const { data: exam, error: dbErr } = await supabase
+          .from("online_exams")
+          .select("*")
+          .eq("join_code", code.toUpperCase())
+          .in("status", ["scheduled","lobby","live"])
+          .single();
+        if (dbErr || !exam) {
+          setErr(data?.error || "Invalid or expired join code. Check with your teacher.");
+          setLoading(false); return;
+        }
+        onJoin({name, school, region, exam, participantId: null});
+      } else {
+        onJoin({name, school, region, exam: data.exam || MOCK_EXAM, participantId: data.participant_id});
+      }
+    } catch(e) {
+      // Final fallback for demo
+      if(code.toUpperCase()==="BIO2024") {
+        onJoin({name,school,region,exam:MOCK_EXAM,participantId:null});
+      } else {
+        setErr("Network error. Check your connection.");
+      }
     }
     setLoading(false);
   };
@@ -239,7 +261,7 @@ const LiveExam=({exam,student,onSubmit})=>{
   const setAns=(id,val)=>setAnswers(p=>({...p,[id]:val}));
   const toggleFlag=id=>setFlagged(p=>{const n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});
 
-  const handleSubmit=(auto=false)=>{
+  const handleSubmit=async(auto=false)=>{
     clearInterval(timerRef.current);
     // Calculate score
     let score=0,total=0;
@@ -249,7 +271,7 @@ const LiveExam=({exam,student,onSubmit})=>{
       if(a!==undefined){
         if(q.type==="mcq"&&a===q.correct) score+=q.marks;
         else if(q.type==="truefalse"&&a===q.correct) score+=q.marks;
-        else if(q.type==="short") score+=Math.round(q.marks*0.7); // assume partial
+        else if(q.type==="short") score+=Math.round(q.marks*0.7);
       }
     });
     const pct = Math.round((score/total)*100);
