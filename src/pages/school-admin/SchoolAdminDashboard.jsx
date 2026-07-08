@@ -1,3 +1,4 @@
+import ApprovalQueue from "../roles/ApprovalQueue";
 import { useState } from "react";
 import { BarChart,Bar,AreaChart,Area,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer } from "recharts";
 import { downloadPDF } from "../../utils/exportPDF";
@@ -35,6 +36,7 @@ const NAV=[
   {icon:"📝",label:"Exams"},
   {icon:"📈",label:"Reports"},
   {icon:"⬆️",label:"Imports"},
+  {icon:"⏳",label:"Approvals"},
   {icon:"⚙️",label:"Settings"},
 ];
 

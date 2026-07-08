@@ -1,3 +1,4 @@
+import ApprovalQueue from "../roles/ApprovalQueue";
 import { useState } from "react";
 import { BarChart,Bar,AreaChart,Area,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,PieChart,Pie,Cell } from "recharts";
 import { downloadPDF } from "../../utils/exportPDF";
@@ -31,6 +32,7 @@ const PENDING_CONTENT=[
 const NAV=[
   {icon:"📊",label:"Platform Overview"},
   {icon:"🏫",label:"Schools"},
+  {icon:"⏳",label:"Approvals"},
   {icon:"👨‍🎓",label:"Students"},
   {icon:"👨‍🏫",label:"Teachers"},
   {icon:"📝",label:"Content Approval"},
@@ -256,6 +258,7 @@ export default function SuperAdminDashboard(){
     "Content Approval":<ContentApprovalTab/>,
     "Upload Papers":<UploadPapersTab/>,
     "Payments":<PaymentsTab/>,
+    "Approvals":<ApprovalQueue role="super_admin" />,
     "Students":<div style={{textAlign:"center",padding:"60px"}}><div style={{fontSize:48,marginBottom:16}}>👨‍🎓</div><div style={{fontWeight:700,fontSize:18,color:C.white}}>All Students</div><div style={{color:C.muted,fontSize:14,marginTop:8}}>52,847 students — connect Supabase to manage.</div></div>,
     "Teachers":<div style={{textAlign:"center",padding:"60px"}}><div style={{fontSize:48,marginBottom:16}}>👨‍🏫</div><div style={{fontWeight:700,fontSize:18,color:C.white}}>All Teachers</div><div style={{color:C.muted,fontSize:14,marginTop:8}}>8,920 teachers — connect Supabase to manage.</div></div>,
     "AI Settings":<div style={{textAlign:"center",padding:"60px"}}><div style={{fontSize:48,marginBottom:16}}>🤖</div><div style={{fontWeight:700,fontSize:18,color:C.white}}>AI Configuration</div><div style={{color:C.muted,fontSize:14,marginTop:8}}>Configure Claude AI tutor settings, prompt templates, and rate limits.</div></div>,
@@ -281,3 +284,6 @@ export default function SuperAdminDashboard(){
     </div>
   );
 }
+
+// ── APPROVAL QUEUE (injected as a tab) ─────────────────────────────────────
+// This component is added to the SuperAdminDashboard tabs map
