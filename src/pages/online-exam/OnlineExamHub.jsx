@@ -252,7 +252,15 @@ const LiveExam=({exam,student,onSubmit})=>{
         else if(q.type==="short") score+=Math.round(q.marks*0.7); // assume partial
       }
     });
-    onSubmit({answers,score,total,percentage:Math.round((score/total)*100),timeTaken:exam.duration_minutes*60-timeLeft});
+    const pct = Math.round((score/total)*100);
+    // Submit to Supabase
+    try {
+      const { supabase } = await import("../../lib/supabase");
+      await supabase.functions.invoke("submit-exam", {
+        body: { type:"online", participant_id: student.participantId, answers, time_secs: exam.duration_minutes*60-timeLeft }
+      });
+    } catch(e) { console.warn("Submit sync failed:", e); }
+    onSubmit({answers,score,total,percentage:pct,timeTaken:exam.duration_minutes*60-timeLeft});
   };
 
   return(
@@ -529,6 +537,7 @@ const ResultsPage=({exam,student,result,allParticipants})=>{
 export default function OnlineExamHub(){
   const[view,setView]=useState("join"); // join | lobby | exam | results
   const[student,setStudent]=useState(null);
+  // participantId stored in student object
   const[exam,setExam]=useState(null);
   const[result,setResult]=useState(null);
   const[participants,setParticipants]=useState(MOCK_PARTICIPANTS);
